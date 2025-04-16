@@ -1,6 +1,6 @@
 import { } from 'react'
 
 const Demo = () => {
-  return <>这里是人力资源页面Home</>
+  return <>这里是审批Home</>
 }
 export default Demo
