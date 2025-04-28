@@ -1,11 +1,11 @@
-import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react-swc'
+import { resolve } from 'path'
 import { defineConfig } from 'vite'
 
-import { resolve } from 'path'
-import compression from 'vite-plugin-compression'
-
-import federation from '@originjs/vite-plugin-federation'
+import viteFederation from '@originjs/vite-plugin-federation'
+import viteTailwindcss from '@tailwindcss/vite'
+import viteCompression from 'vite-plugin-compression'
+import vitePluginImageTools from 'vite-plugin-image-tools'
 
 export default defineConfig({
   server: {
@@ -25,9 +25,12 @@ export default defineConfig({
   },
   plugins: [
     react(),
-    tailwindcss(),
-    compression({ threshold: 10240 }),
-    federation({
+    viteTailwindcss(),
+    vitePluginImageTools({
+      quality: 70,
+      enableWebp: true,
+    }),
+    viteFederation({
       name: 'projectApp',
       filename: 'remoteEntry.js',
       exposes: {
@@ -40,11 +43,18 @@ export default defineConfig({
       },
       shared: ['react', 'react-dom', 'react-router', 'react-redux', '@reduxjs/toolkit', 'axios'],
     }),
+    viteCompression({ threshold: 10240 }),
   ],
   build: {
     modulePreload: false,
     target: 'esnext',
-    minify: false,
-    cssCodeSplit: false,
+    minify: 'terser',
+    rollupOptions: {
+      output: {
+        entryFileNames: 'assets/js/[name]-[hash].js',
+        chunkFileNames: 'assets/js/chunks/[name]-[hash].js',
+        assetFileNames: 'assets/[ext]/[name]-[hash].[ext]',
+      },
+    },
   },
 })
